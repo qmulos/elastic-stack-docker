@@ -94,6 +94,7 @@ services:
       - esdata01:/usr/share/elasticsearch/data
     ports:
       - ${ES_PORT}:9200
+    pull_policy: missing
     environment:
       - node.name=es01
       - cluster.name=${CLUSTER_NAME}
@@ -130,10 +131,11 @@ services:
     depends_on:
       es01:
         condition: service_healthy
-    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
+    build: kibana
     labels:
       co.elastic.logs/module: kibana
     volumes:
+      #- ${KIBANA_LOCAL_PATH:?err}:/usr/share/kibana
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
       - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
@@ -164,6 +166,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
+    #command: ["yarn", "-c", "start"]
 
   metricbeat01:
     depends_on:
@@ -173,6 +176,7 @@ services:
         condition: service_healthy
     image: docker.elastic.co/beats/metricbeat:${STACK_VERSION}
     user: root
+    pull_policy: missing
     volumes:
       - certs:/usr/share/metricbeat/certs
       - metricbeatdata01:/usr/share/metricbeat/data
@@ -201,6 +205,7 @@ services:
         condition: service_healthy
     image: docker.elastic.co/beats/filebeat:${STACK_VERSION}
     user: root
+    pull_policy: missing
     volumes:
       - certs:/usr/share/filebeat/certs
       - filebeatdata01:/usr/share/filebeat/data
@@ -228,6 +233,7 @@ services:
     labels:
       co.elastic.logs/module: logstash
     user: root
+    pull_policy: missing
     volumes:
       - certs:/usr/share/logstash/certs
       - logstashdata01:/usr/share/logstash/data
@@ -258,6 +264,7 @@ services:
       - ${FLEET_PORT}:8220
       - ${APMSERVER_PORT}:8200
     user: root
+    pull_policy: missing
     environment:
       - SSL_CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt
       - CERTIFICATE_AUTHORITIES=/certs/ca/ca.crt

@@ -1,0 +1,25 @@
+# Update package lists
+RUN apt-get update
+
+# Install dependencies
+RUN apt-get install -y curl gnupg2 ca-certificates
+
+# Add official Yarn package signing key
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+
+# Add Yarn repository
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+
+# Update package lists (again)
+RUN apt-get update
+
+# Install Yarn globally
+RUN apt-get install -y yarn
+
+# Set path to Yarn bin directory
+RUN sudo -u kibana -s
+RUN echo 'export PATH="$PATH:/usr/bin/yarn"' >> /etc/profile
+
+# CMD run kibana
+#CMD ["/bin/bash"]
+#CMD ["yarn", "start", "/usr/share/kibana"]
