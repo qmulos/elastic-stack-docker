@@ -131,14 +131,17 @@ services:
     depends_on:
       es01:
         condition: service_healthy
-    build: kibana
+    build: 
+      context: kibana
+      no_cache: true
+    platform: "linux/amd64"
     labels:
       co.elastic.logs/module: kibana
     volumes:
-      #- ${KIBANA_LOCAL_PATH:?err}:/usr/share/kibana
+      - ./kibana.yml:/tmp/kibana.dev.yml:ro
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
-      - ./kibana.yml:/usr/share/kibana/config/kibana.yml:ro
+      - ${KIBANA_REPO_PATH:?err}:/usr/share/kibana
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -166,7 +169,11 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-    #command: ["yarn", "-c", "start"]
+    entrypoint: 
+      - /bin/bash
+      - -c
+      - /tmp/entrypoint.sh
+  
 
   metricbeat01:
     depends_on:
