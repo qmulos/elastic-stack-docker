@@ -134,6 +134,10 @@ services:
     build: 
       context: kibana
       no_cache: true
+      args:
+        - KIBANA_REPO_PATH=${KIBANA_REPO_PATH:?err}
+        - KIBANA_REPO=${KIBANA_REPO:?err}
+        - KIBANA_BRANCH=${KIBANA_BRANCH:?err}
     platform: "linux/amd64"
     labels:
       co.elastic.logs/module: kibana
@@ -141,7 +145,7 @@ services:
       - ./kibana.yml:/tmp/kibana.dev.yml:ro
       - certs:/usr/share/kibana/config/certs
       - kibanadata:/usr/share/kibana/data
-      - ${KIBANA_REPO_PATH:?err}:/usr/share/kibana
+      - ${KIBANA_REPO_PATH:?err}/kibana:/usr/share/kibana:rw
     ports:
       - ${KIBANA_PORT}:5601
     environment:
@@ -169,10 +173,10 @@ services:
       interval: 10s
       timeout: 10s
       retries: 120
-    entrypoint: 
-      - /bin/bash
-      - -c
-      - /tmp/entrypoint.sh
+    #entrypoint:
+     # - /bin/bash
+      #- -c
+      #- /tmp/entrypoint.sh
   
 
   metricbeat01:
